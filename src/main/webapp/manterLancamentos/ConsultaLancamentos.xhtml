@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/template/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<f:metadata>
+		<f:viewAction action="#{manterLancamentoBean.consultar}" />
+	</f:metadata>
+	<ui:define name="titulo">Consulta de lançamentos</ui:define>
+	<ui:define name="corpo">
+		<h:form id="frm">
+			<p:growl id="msgs" showDetail="true" />
+			<p:tabView dynamic="true" cache="false" activeIndex="#{manterLancamentoBean.activeTab}"
+				value="#{manterLancamentoBean.listaMonths}" var="month">
+				<p:ajax event="tabChange"
+					listener="#{manterLancamentoBean.onTabChange}" />
+				<p:tab title="#{month.descricao}">
+					<p:dataTable id="tblLancamentos"
+						selection="#{manterLancamentoBean.lancamentoSelecionado}"
+						rowKey="#{lancamento.id}"
+						value="#{manterLancamentoBean.lancamentos}" var="lancamento"
+						border="1" cellspacing="0" cellpadding="2" paginator="true"
+						rows="15" paginatorPosition="bottom" widgetVar="lancamentosTable"
+						sortBy="#{lancamento.id}"
+						emptyMessage="Nenhum registro encontrado.">
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputText value="Lançamentos de #{month.descricao}" />
+							</p:outputPanel>
+						</f:facet>
+						<p:column headerText="Pessoa" sortBy="#{lancamento.pessoa.nome}">
+							<h:outputText value="#{lancamento.pessoa.nome}" />
+						</p:column>
+						<p:column headerText="Descrição" filterMatchMode="contains"
+							sortBy="#{lancamento.descricao}">
+							<h:outputText value="#{lancamento.descricao}" />
+						</p:column>
+						<p:column headerText="Categoria"
+							sortBy="#{lancamento.categoria.descricao}">
+							<h:outputText value="#{lancamento.categoria.descricao}" />
+						</p:column>
+						<p:column headerText="Tipo">
+							<h:outputText value="#{lancamento.tipo.descricao}" />
+						</p:column>
+						<p:column headerText="Vencimento" style="text-align: center"
+							sortBy="#{lancamento.dataVencimento}">
+							<h:outputText value="#{lancamento.dataVencimento}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Pagamento" style="text-align: center"
+							sortBy="#{lancamento.dataPagamento}">
+							<h:outputText value="#{lancamento.dataPagamento}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Situação" style="text-align: center"
+							sortBy="#{lancamento.isPago}">
+							<h:outputText value="Pago" rendered="#{lancamento.isPago}" />
+							<h:outputText value="Aberto" rendered="#{not lancamento.isPago}" />
+						</p:column>
+						<p:column headerText="Valor" style="text-align: right"
+							sortBy="#{lancamento.valor}">
+							<h:outputText value="#{lancamento.valor}">
+								<f:convertNumber type="currency" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Ações" style="text-align: center">
+							<p:button icon="ui-icon-pencil" title="Editar"
+								outcome="/manterLancamentos/CadastroLancamentos?faces">
+								<f:param name="id" value="#{lancamento.id}" />
+							</p:button>
+							<p:commandButton icon="ui-icon-trash" title="Excluir"
+								process="@form" update="@form"
+								action="#{manterLancamentoBean.excluir}">
+								<f:setPropertyActionListener value="#{lancamento}"
+									target="#{manterLancamentoBean.lancamentoSelecionado}" />
+							</p:commandButton>
+						</p:column>
+						<p:rowExpansion>
+							<p:panelGrid columns="2" style="width:300px">
+								<f:facet name="header">
+								</f:facet>
+								<h:outputText value="Tipo de despesa:" />
+								<h:outputText value="#{lancamento.tipo.descricao}" />
+							</p:panelGrid>
+						</p:rowExpansion>
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column footerText="Total " style="text-align:right"
+									colspan="8" />
+								<p:column footerText="#{manterLancamentoBean.somaValores}"
+									style="text-align:right" />
+							</p:row>
+						</p:columnGroup>
+
+					</p:dataTable>
+				</p:tab>
+			</p:tabView>
+		</h:form>
+	</ui:define>
+</ui:composition>

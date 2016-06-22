@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf14507208910330" configfile="/Financeiro/src/main/webapp/WEB-INF/faces-config.xml">
+  <nodes xsi:type="pageflow:PFPage" name="manterLogin/login.xhtml" id="pf14538122452323" referenceLink="//@navigationRule.0/@fromViewId|" outlinks="pf14538122452324" path="/manterLogin/login.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="manterLancamentos/ConsultaLancamentos.xhtml" id="pf14538122452325" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf14538122452324" path="/manterLancamentos/ConsultaLancamentos.xhtml"/>
+  <links id="pf14538122452324" target="pf14538122452325" source="pf14538122452323" outcome="Consulta"/>
+</pageflow:Pageflow>

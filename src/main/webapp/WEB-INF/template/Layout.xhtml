@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet library="css" name="estilo.css" />
+	<title><ui:insert name="title">FINANCE</ui:insert></title>
+</h:head>
+<h:body>
+	<header class="header">FINANCE - Gerenciamento Financeiro
+	</header>
+	<br />
+	<br></br>
+
+	<h:form>
+		<p:menubar>
+			<p:submenu label="Cadastros">
+				<p:menuitem value="Lançamento"
+					action="/manterLancamentos/CadastroLancamentos?faces-redirect=true" />
+			</p:submenu>
+			<p:submenu label="Consultas">
+				<p:menuitem value="Lançamentos"
+					action="/manterLancamentos/ConsultaLancamentos?faces-redirect=true" />
+			</p:submenu>
+			<p:submenu label="Sistema">
+				<p:menuitem value="Sair" action="#{loginBean.logout}"
+					icon="ui-icon-close" />
+			</p:submenu>
+			<f:facet name="options">
+				<p:outputPanel>
+					<h:outputText value="Usuário: #{username} "/>
+					<p:commandButton icon="ui-icon-power" title="Sair" value="Sair"
+					process="@form" update="@form" action="#{loginBean.logout}" ajax="false">
+				</p:commandButton>
+				</p:outputPanel>
+			</f:facet>
+		</p:menubar>
+	</h:form>
+	<div id="conteudo">
+		<ui:insert name="corpo" />
+		<br />
+		<p:ajaxStatus styleClass="ajax-status">
+			<f:facet name="start">
+				<h:outputText value="Carregando..." styleClass="h1" />
+				<h:graphicImage library="images" name="loading.gif" height="35px"
+					width="35px" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+	</div>
+	<footer class="footer">
+		<H3>Desenvolvido por: Alex Mendes</H3>
+	</footer>
+</h:body>
+</html>
