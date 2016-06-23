@@ -44,14 +44,14 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Núcleo do Hibernate -->
+		<!-- Nucleo do Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>4.2.6.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Implementação de EntityManager da JPA -->
+		<!-- Implementaï¿½ï¿½o de EntityManager da JPA -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -77,7 +77,7 @@
 			<version>5.0.1.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Weld (implementação do CDI) -->
+		<!-- Weld (implementaï¿½ï¿½o do CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet</artifactId>
