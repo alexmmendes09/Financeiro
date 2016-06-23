@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.algaworks</groupId>
 	<artifactId>Financeiro</artifactId>
@@ -45,14 +44,14 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- NÃºcleo do Hibernate -->
+		<!-- Núcleo do Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>4.2.6.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- ImplementaÃ§Ã£o de EntityManager da JPA -->
+		<!-- Implementação de EntityManager da JPA -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -78,7 +77,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<version>5.0.1.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Weld (implementaÃ§Ã£o do CDI) -->
+		<!-- Weld (implementação do CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet</artifactId>
@@ -128,4 +127,26 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<version>1.0.10</version>
 		</dependency>
 	</dependencies>
+<profiles>
+        <profile>
+<!-- When built in OpenShift the openshift profile will be used when invoking mvn. -->
+<!-- Use this profile for any OpenShift specific customization your app will need. -->
+<!-- By default that is to put the resulting archive into the deployments folder. -->
+<!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
+<id>openshift</id>
+<build>
+   <finalName>Financeiro</finalName>
+   <plugins>
+     <plugin>
+       <artifactId>maven-war-plugin</artifactId>
+       <version>2.2</version>
+       <configuration>
+         <outputDirectory>deployments</outputDirectory>
+         <warName>ROOT</warName>
+       </configuration>
+     </plugin>
+   </plugins>
+ </build>
+</profile>
+    </profiles>
 </project>
