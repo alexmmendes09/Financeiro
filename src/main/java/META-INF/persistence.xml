@@ -7,23 +7,14 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<properties>
 			<!-- OPENSHIFT -->
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/financeiro" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.2.1.130:3306/financeiro" />
 			<property name="javax.persistence.jdbc.user" value="admink3fnezF" />
 			<property name="javax.persistence.jdbc.password" value="q95VNb2GDBYG" />
-			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
-			<property name="hibernate.show_sql" value="true" />
-			<property name="hibernate.format_sql" value="true" />
-			<property name="hibernate.hbm2ddl.auto" value="update" />
-		</properties>
-	</persistence-unit>
-	<persistence-unit name="FinanceiroOS">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<properties>
-			<!-- LOCAL -->
+			<!-- LOCAL 
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/financeiro" />
 			<property name="javax.persistence.jdbc.user" value="root" />
 			<property name="javax.persistence.jdbc.password" value="12345678" />
+			-->
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
 			<property name="hibernate.show_sql" value="true" />
