@@ -12,9 +12,11 @@ import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.PostLoad;
 
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.ToggleEvent;
 
 import br.com.financeiro.dao.CategoriasDAO;
 import br.com.financeiro.dao.LancamentosDAO;
@@ -55,7 +57,7 @@ public class ManterLancamentoBean implements Serializable {
 	private String CONSULTA = "/manterLancamentos/ConsultaLancamentos?faces-redirect=true";
 	private String SUCESS = "Ação realizada com sucesso!";
 	private String ERROR = "Ação não permitida!";
-	private int currentTab = 1;
+	private int currentTab = UtilFormatter.mesAtual();
 	private Integer activeTab;
 	@Inject
 	private Usuario usuario;
@@ -160,6 +162,12 @@ public class ManterLancamentoBean implements Serializable {
 	public void setLancamentosService(LancamentosService lancamentosService) {
 		this.lancamentosService = lancamentosService;
 	}
+	
+	public void saldoMensal(ToggleEvent event) {
+        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saldo Mensal", 
+        		"Saldo para o mês de "+ UtilFormatter.mesAtualTexto() + "é de:" +getSomaValores());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
@@ -175,11 +183,16 @@ public class ManterLancamentoBean implements Serializable {
 
 	/** Methods **/
 
+	@PostLoad
+	public void loadComponents() throws NegocioException{
+		setActiveTab(currentTab-1);
+		consultar();
+		SessionUtil.getUserNameSession();
+	}
+	
 	@PostConstruct
 	public void consultar() throws NegocioException {
-		setLancamentos(getLancamentosService().porMes(getCurrentTab()));
-		SessionUtil.getUserNameSession();
-		
+		setLancamentos(getLancamentosService().porMes(UtilFormatter.mesAtual()));
 	}
 
 	@Transactional
@@ -249,10 +262,10 @@ public class ManterLancamentoBean implements Serializable {
 		FacesContext.getCurrentInstance().renderResponse();
 	}
 
-	public void onTabChange(TabChangeEvent event) {
+	public void onTabChange(TabChangeEvent event) throws NegocioException {
 		TabView tv = (TabView) event.getComponent();
-		this.currentTab = tv.getActiveIndex() + 1;
-		setActiveTab(activeTab);
-		setLancamentos(getLancamentosService().porMes(getCurrentTab()));
+		this.currentTab = tv.getActiveIndex()+1;
+		setActiveTab(currentTab);
+		setLancamentos(getLancamentosService().porMes(currentTab));
 	}
 }

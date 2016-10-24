@@ -6,12 +6,19 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 	<f:metadata>
-		<f:viewAction action="#{manterLancamentoBean.consultar}" />
+		<f:viewAction action="#{manterLancamentoBean.loadComponents}" />
 	</f:metadata>
 	<ui:define name="titulo">Consulta de lançamentos</ui:define>
 	<ui:define name="corpo">
 		<h:form id="frm">
 			<p:growl id="msgs" showDetail="true" />
+			<p:fieldset legend="Saldo Mensal" toggleable="true"
+					toggleSpeed="500">
+					<p:ajax event="toggle" resetValues="true" update="msgs" />
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputText value="#{manterLancamentoBean.somaValores}"></h:outputText>
+					</h:panelGrid>
+				</p:fieldset>
 			<p:tabView dynamic="true" cache="false" activeIndex="#{manterLancamentoBean.activeTab}"
 				value="#{manterLancamentoBean.listaMonths}" var="month">
 				<p:ajax event="tabChange"
