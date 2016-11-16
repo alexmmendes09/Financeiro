@@ -24,10 +24,10 @@ public class LancamentosDAO {
 	public LancamentosDAO(EntityManager manager) {
 		this.manager = manager;
 	}
-	
+
 	public LancamentosDAO() {
 	}
-	
+
 	public List<Lancamento> todos() {
 		TypedQuery<Lancamento> query = manager.createQuery("from Lancamento",
 				Lancamento.class);
@@ -58,11 +58,12 @@ public class LancamentosDAO {
 	public void remover(Lancamento lancamento) {
 		this.manager.remove(lancamento);
 	}
-	
 
 	public List<Lancamento> porMes(int month) {
-		TypedQuery<Lancamento> query = manager.createQuery("from Lancamento l where MONTH(L.dataVencimento) = " + month +
-				" AND L.username = '" + SessionUtil.getUserNameSession()+"'",
+		TypedQuery<Lancamento> query = manager.createQuery(
+				"from Lancamento l where MONTH(L.dataVencimento) = " + month
+						+ " AND L.username = '"
+						+ SessionUtil.getUserNameSession() + "'",
 				Lancamento.class);
 		return query.getResultList();
 	}

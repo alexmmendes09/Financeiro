@@ -17,7 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -27,7 +29,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @Entity
 @Table(name = "lancamento")
-public class Lancamento {
+public class Lancamento implements Cloneable {
 	
 	private Long id;
 	private Pessoa pessoa;
@@ -39,7 +41,8 @@ public class Lancamento {
 	private Date dataPagamento;
 	private Boolean isPago;
 	private String username;
-	
+	private Integer parcelas;
+	private TipoPagto tipoPagto;
 	
 	@Id
 	@GeneratedValue
@@ -128,6 +131,24 @@ public class Lancamento {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
+	@Column(length = 5, nullable = true)
+	public Integer getParcelas() {
+		return parcelas;
+	}
+	public void setParcelas(Integer parcelas) {
+		this.parcelas = parcelas;
+	}
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	public TipoPagto getTipoPagto() {
+		return tipoPagto;
+	}
+	public void setTipoPagto(TipoPagto tipoPagto) {
+		this.tipoPagto = tipoPagto;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -151,5 +172,9 @@ public class Lancamento {
 			return false;
 		return true;
 	}
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 	
 }

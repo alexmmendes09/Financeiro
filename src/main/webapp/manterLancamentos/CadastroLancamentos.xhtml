@@ -55,6 +55,21 @@
 						minFractionDigits="2" />
 					<p:ajax update="valor" />
 				</p:inputText>
+				
+				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto" />
+				<p:selectOneButton id="tipoPagto" required="true"
+					value="#{manterLancamentoBean.lancamento.tipoPagto}">
+					<f:selectItems value="#{manterLancamentoBean.tiposPagtos}"
+						var="tipoPagto" itemValue="#{tipoPagto}"
+						itemLabel="#{tipoPagto.descricao}" />
+				</p:selectOneButton>
+
+				<p:outputLabel value="Informe a quantidade de parcelas:"
+					for="parcelas" />
+				<p:inputText id="parcelas" value="#{manterLancamentoBean.lancamento.parcelas}"
+					label="parcelas">
+					<f:validateDoubleRange minimum="2" maximum="100" />
+				</p:inputText>
 
 				<p:outputLabel value="Data de vencimento" for="dataVencimento" />
 				<p:calendar id="dataVencimento" size="12" pattern="dd/MM/yyyy"

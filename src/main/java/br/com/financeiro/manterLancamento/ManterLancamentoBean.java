@@ -2,6 +2,7 @@ package br.com.financeiro.manterLancamento;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +29,7 @@ import br.com.financeiro.model.Lancamento;
 import br.com.financeiro.model.Month;
 import br.com.financeiro.model.Pessoa;
 import br.com.financeiro.model.TipoLancamento;
+import br.com.financeiro.model.TipoPagto;
 import br.com.financeiro.model.Usuario;
 import br.com.financeiro.service.LancamentosService;
 import br.com.financeiro.util.SessionUtil;
@@ -81,13 +83,14 @@ public class ManterLancamentoBean implements Serializable {
 	public void setCurrentTab(int currentTab) {
 		this.currentTab = currentTab;
 	}
-	public Integer getActiveTab() {
-        return activeTab;
-    }
 
-    public void setActiveTab(Integer activeTab) {
-        this.activeTab = activeTab;
-    }
+	public Integer getActiveTab() {
+		return activeTab;
+	}
+
+	public void setActiveTab(Integer activeTab) {
+		this.activeTab = activeTab;
+	}
 
 	/** Getters and Setters **/
 	public Usuario getUsuario() {
@@ -122,6 +125,10 @@ public class ManterLancamentoBean implements Serializable {
 
 	public TipoLancamento[] getTiposLancamentos() {
 		return TipoLancamento.values();
+	}
+
+	public TipoPagto[] getTiposPagtos() {
+		return TipoPagto.values();
 	}
 
 	public Lancamento getLancamento() {
@@ -162,12 +169,14 @@ public class ManterLancamentoBean implements Serializable {
 	public void setLancamentosService(LancamentosService lancamentosService) {
 		this.lancamentosService = lancamentosService;
 	}
-	
+
 	public void saldoMensal(ToggleEvent event) {
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saldo Mensal", 
-        		"Saldo para o mês de "+ UtilFormatter.mesAtualTexto() + "é de:" +getSomaValores());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+				"Saldo Mensal", "Saldo para o mês de "
+						+ UtilFormatter.mesAtualTexto() + "é de:"
+						+ getSomaValores());
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
 
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
@@ -184,12 +193,12 @@ public class ManterLancamentoBean implements Serializable {
 	/** Methods **/
 
 	@PostLoad
-	public void loadComponents() throws NegocioException{
-		setActiveTab(currentTab-1);
+	public void loadComponents() throws NegocioException {
+		setActiveTab(currentTab - 1);
 		consultar();
 		SessionUtil.getUserNameSession();
 	}
-	
+
 	@PostConstruct
 	public void consultar() throws NegocioException {
 		setLancamentos(getLancamentosService().porMes(UtilFormatter.mesAtual()));
@@ -199,7 +208,8 @@ public class ManterLancamentoBean implements Serializable {
 	public void excluir() {
 		FacesContext context = FacesContext.getCurrentInstance();
 		try {
-			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
+			getLancamentoSelecionado().setUsername(
+					SessionUtil.getUserNameSession());
 			this.lancamentosService.excluir(getLancamentoSelecionado());
 			context.addMessage(null, new FacesMessage(
 					FacesMessage.SEVERITY_ERROR, SUCESS, EXCLUSAO));
@@ -223,11 +233,25 @@ public class ManterLancamentoBean implements Serializable {
 	}
 
 	@Transactional
-	public String salvar() throws NegocioException {
+	public String salvar() throws NegocioException, CloneNotSupportedException {
 		FacesContext context = FacesContext.getCurrentInstance();
 		try {
 			getLancamento().setUsername(SessionUtil.getUserNameSession());
-			getLancamentosService().guardar(getLancamento());
+
+			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado") ) {
+				Calendar c;
+				Lancamento lancamentoClone;
+				for (int i = 0; i < lancamento.getParcelas(); i++) {
+					c = Calendar.getInstance();
+					c.setTime(lancamento.getDataVencimento());
+					c.add(Calendar.MONTH, i);
+					lancamentoClone = (Lancamento) lancamento.clone();
+					lancamentoClone.setDataVencimento(c.getTime());
+					getLancamentosService().guardar(lancamentoClone);
+				}
+			} else {
+				getLancamentosService().guardar(getLancamento());
+			}
 			setLancamento(new Lancamento());
 			context.addMessage(null, new FacesMessage(
 					FacesMessage.SEVERITY_ERROR, SUCESS, INCLUSAO));
@@ -264,7 +288,7 @@ public class ManterLancamentoBean implements Serializable {
 
 	public void onTabChange(TabChangeEvent event) throws NegocioException {
 		TabView tv = (TabView) event.getComponent();
-		this.currentTab = tv.getActiveIndex()+1;
+		this.currentTab = tv.getActiveIndex() + 1;
 		setActiveTab(currentTab);
 		setLancamentos(getLancamentosService().porMes(currentTab));
 	}

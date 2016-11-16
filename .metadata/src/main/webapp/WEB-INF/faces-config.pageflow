@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf14507208910330" configfile="/Financeiro/src/main/webapp/WEB-INF/faces-config.xml">
-  <nodes xsi:type="pageflow:PFPage" name="manterLogin/login.xhtml" id="pf14538122452323" referenceLink="//@navigationRule.0/@fromViewId|" outlinks="pf14538122452324" path="/manterLogin/login.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="manterLancamentos/ConsultaLancamentos.xhtml" id="pf14538122452325" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf14538122452324" path="/manterLancamentos/ConsultaLancamentos.xhtml"/>
-  <links id="pf14538122452324" target="pf14538122452325" source="pf14538122452323" outcome="Consulta"/>
+  <nodes xsi:type="pageflow:PFPage" name="manterLancamentos/ConsultaLancamentos.xhtml" x="122" y="562" id="pf14775849487454" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" path="/ConsultaLancamentos.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="manterLogin/login.xhtml" id="pf147766256581917" referenceLink="//@navigationRule.0/@fromViewId|" outlinks="pf147766256581919 pf147766376577824 pf147766417281426" inlinks="pf147766256581919" path="/manterLogin/login.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="manterLancamentos/CadastroLancamentos.xhtml" id="pf147766376577825" referenceLink="//@navigationRule.0/@navigationCase.2/@toViewId|" inlinks="pf147766376577824" path="/manterLancamentos/CadastroLancamentos.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="manterLancamentos/ConsultaLancamentos.xhtml" id="pf147766417281427" referenceLink="//@navigationRule.0/@navigationCase.1/@toViewId|" inlinks="pf147766417281426" path="/manterLancamentos/ConsultaLancamentos.xhtml"/>
+  <links id="pf147766256581919" target="pf147766256581917" source="pf147766256581917" outcome="error"/>
+  <links id="pf147766376577824" target="pf147766376577825" source="pf147766256581917" outcome="cadastro"/>
+  <links id="pf147766417281426" target="pf147766417281427" source="pf147766256581917" outcome="consulta"/>
 </pageflow:Pageflow>

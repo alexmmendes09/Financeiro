@@ -1,7 +1,10 @@
 package br.com.financeiro.model;
 
 public enum TipoLancamento {
-	RECEITA("Receita"), DESPESA("Despesa");
+	
+	RECEITA("Receita"),
+	DESPESA("Despesa");
+	
 	private String descricao;
 
 	TipoLancamento(String descricao) {
