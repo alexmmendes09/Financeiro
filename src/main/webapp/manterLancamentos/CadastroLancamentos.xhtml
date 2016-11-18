@@ -39,9 +39,8 @@
 
 				<p:outputLabel value="Categoria" for="categoria" />
 				<p:selectOneMenu
-					value="#{manterLancamentoBean.lancamento.categoria}"
-					id="categoria" filter="true" filterMatchMode="contains"
-					required="true">
+					value="#{manterLancamentoBean.lancamento.categoria}" id="categoria"
+					filter="true" filterMatchMode="contains" required="true">
 					<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
 					<f:selectItems value="#{manterLancamentoBean.todasCategorias}"
 						var="categoria" itemValue="#{categoria}"
@@ -55,27 +54,29 @@
 						minFractionDigits="2" />
 					<p:ajax update="valor" />
 				</p:inputText>
-				
+
 				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto" />
-				<p:selectOneButton id="tipoPagto" required="true"
-					value="#{manterLancamentoBean.lancamento.tipoPagto}">
+				<p:selectOneButton id="tipoPagto" required="true" immediate="true"
+					value="#{manterLancamentoBean.lancamento.tipoPagto}"
+					valueChangeListener="#{manterLancamentoBean.tipoPagtoModificado}"
+					onchange="submit()">
 					<f:selectItems value="#{manterLancamentoBean.tiposPagtos}"
 						var="tipoPagto" itemValue="#{tipoPagto}"
 						itemLabel="#{tipoPagto.descricao}" />
 				</p:selectOneButton>
 
-				<p:outputLabel value="Informe a quantidade de parcelas:"
-					for="parcelas" />
-				<p:inputText id="parcelas" value="#{manterLancamentoBean.lancamento.parcelas}"
-					label="parcelas">
-					<f:validateDoubleRange minimum="2" maximum="100" />
+				<p:outputLabel value="Quantidade de parcelas:"
+					for="parcelas" rendered="#{manterLancamentoBean.parcelasDisable}"/>
+				<p:inputText id="parcelas" rendered="#{manterLancamentoBean.parcelasDisable}"
+					value="#{manterLancamentoBean.lancamento.parcelas}">
+					<f:attribute name="checado"
+						value="#{manterLancamentoBean.tipoPagtoModificado}" />
 				</p:inputText>
 
 				<p:outputLabel value="Data de vencimento" for="dataVencimento" />
 				<p:calendar id="dataVencimento" size="12" pattern="dd/MM/yyyy"
 					required="true"
 					value="#{manterLancamentoBean.lancamento.dataVencimento}" />
-
 
 				<h:outputLabel value="Data de pagamento" for="dataPagamento"
 					rendered="#{manterLancamentoBean.lancamento.isPago}" />
@@ -86,16 +87,15 @@
 					<f:attribute name="checado"
 						value="#{manterLancamentoBean.lancamento.isPago}" />
 				</p:calendar>
-
 				<h:outputLabel />
+
 				<h:panelGroup>
 					<h:selectBooleanCheckbox id="isPago"
 						value="#{manterLancamentoBean.lancamento.isPago}" immediate="true"
 						valueChangeListener="#{manterLancamentoBean.lancamentoPagoModificado}"
-						onchange="jsf.ajax.request(this, event, {execute: '@form', render: '@all'})" />
+						onclick="submit()" />
 					<h:outputLabel value="Conta paga" for="pagoCheckbox" />
 				</h:panelGroup>
-
 			</h:panelGrid>
 			<p:commandButton value="Salvar"
 				action="#{manterLancamentoBean.salvar}" icon="ui-icon-disk"

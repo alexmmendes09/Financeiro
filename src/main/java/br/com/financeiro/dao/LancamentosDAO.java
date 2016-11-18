@@ -36,6 +36,7 @@ public class LancamentosDAO {
 
 	public void adicionar(Lancamento lancamento) {
 		this.manager.persist(lancamento);
+		this.manager.close();
 	}
 
 	public List<String> descricoesQueContem(String descricao) {
@@ -44,6 +45,7 @@ public class LancamentosDAO {
 						+ "where upper(descricao) like upper(:descricao)",
 				String.class);
 		query.setParameter("descricao", "%" + descricao + "%");
+		this.manager.close();
 		return query.getResultList();
 	}
 
@@ -60,11 +62,18 @@ public class LancamentosDAO {
 	}
 
 	public List<Lancamento> porMes(int month) {
-		TypedQuery<Lancamento> query = manager.createQuery(
-				"from Lancamento l where MONTH(L.dataVencimento) = " + month
-						+ " AND L.username = '"
-						+ SessionUtil.getUserNameSession() + "'",
-				Lancamento.class);
+		TypedQuery<Lancamento> query = null;
+		try {
+			query = manager.createQuery(
+					"from Lancamento l where MONTH(L.dataVencimento) = " + month
+							+ " AND L.username = '"
+							+ SessionUtil.getUserNameSession() + "'",
+					Lancamento.class);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			this.manager.close();
+			e.printStackTrace();
+		}
 		return query.getResultList();
 	}
 }

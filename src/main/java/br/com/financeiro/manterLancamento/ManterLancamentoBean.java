@@ -61,6 +61,7 @@ public class ManterLancamentoBean implements Serializable {
 	private String ERROR = "Ação não permitida!";
 	private int currentTab = UtilFormatter.mesAtual();
 	private Integer activeTab;
+	private boolean parcelasDisable;
 	@Inject
 	private Usuario usuario;
 	private List<Month> listaMonths;
@@ -181,7 +182,7 @@ public class ManterLancamentoBean implements Serializable {
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
 		for (Lancamento lancamento : getLancamentosService().porMes(currentTab)) {
-			if (lancamento.getTipo().getDescricao().equals("Receita")) {
+			if (lancamento.getTipo().getDescricao().equals("Receita")&& lancamento.getIsPago().equals(true)) {
 				total = total.add(lancamento.getValor());
 			} else {
 				total = total.subtract(lancamento.getValor());
@@ -213,7 +214,7 @@ public class ManterLancamentoBean implements Serializable {
 			this.lancamentosService.excluir(getLancamentoSelecionado());
 			context.addMessage(null, new FacesMessage(
 					FacesMessage.SEVERITY_ERROR, SUCESS, EXCLUSAO));
-			consultar();
+			loadComponents();
 		} catch (NegocioException e) {
 			FacesMessage mensagem = new FacesMessage(e.getMessage());
 			context.addMessage(null, new FacesMessage(
@@ -229,6 +230,16 @@ public class ManterLancamentoBean implements Serializable {
 	public void lancamentoPagoModificado(ValueChangeEvent event) {
 		this.lancamento.setIsPago((Boolean) event.getNewValue());
 		this.lancamento.setDataPagamento(null);
+		FacesContext.getCurrentInstance().renderResponse();
+	}
+	public void tipoPagtoModificado(ValueChangeEvent event) {
+	    String selectedVal=event.getNewValue().toString();
+		if (selectedVal.equals("PARCELADO") ) {
+			setParcelasDisable(true);
+		}else{
+			setParcelasDisable(false);
+		}
+		this.lancamento.setParcelas(0);
 		FacesContext.getCurrentInstance().renderResponse();
 	}
 
@@ -291,5 +302,13 @@ public class ManterLancamentoBean implements Serializable {
 		this.currentTab = tv.getActiveIndex() + 1;
 		setActiveTab(currentTab);
 		setLancamentos(getLancamentosService().porMes(currentTab));
+	}
+
+	public boolean isParcelasDisable() {
+		return parcelasDisable;
+	}
+
+	public void setParcelasDisable(boolean parcelasDisable) {
+		this.parcelasDisable = parcelasDisable;
 	}
 }
