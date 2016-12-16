@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -17,16 +16,14 @@ import javax.persistence.PostLoad;
 
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.event.ToggleEvent;
 
 import br.com.financeiro.dao.CategoriasDAO;
 import br.com.financeiro.dao.LancamentosDAO;
-import br.com.financeiro.dao.MonthDAO;
 import br.com.financeiro.dao.PessoasDAO;
 import br.com.financeiro.exception.NegocioException;
 import br.com.financeiro.model.Categoria;
 import br.com.financeiro.model.Lancamento;
-import br.com.financeiro.model.Month;
+import br.com.financeiro.model.Meses;
 import br.com.financeiro.model.Pessoa;
 import br.com.financeiro.model.TipoLancamento;
 import br.com.financeiro.model.TipoPagto;
@@ -51,6 +48,7 @@ public class ManterLancamentoBean implements Serializable {
 	@Inject
 	private LancamentosDAO lancamentosRepository;
 	private List<Lancamento> lancamentos;
+	private List<String> listaAnosValidos;
 	@Inject
 	private LancamentosService lancamentosService;
 	private Lancamento lancamentoSelecionado;
@@ -62,19 +60,12 @@ public class ManterLancamentoBean implements Serializable {
 	private int currentTab = UtilFormatter.mesAtual();
 	private Integer activeTab;
 	private boolean parcelasDisable;
+	private String tabAtualConsulta;
 	@Inject
 	private Usuario usuario;
-	private List<Month> listaMonths;
-	@Inject
-	private MonthDAO monthDAO;
-
-	public List<Month> getListaMonths() {
-		this.listaMonths = monthDAO.todos();
-		return listaMonths;
-	}
-
-	public void setListaMonths(List<Month> listaMonths) {
-		this.listaMonths = listaMonths;
+	
+	public Meses[] getListaMeses(){
+		return Meses.values();
 	}
 
 	public int getCurrentTab() {
@@ -93,13 +84,20 @@ public class ManterLancamentoBean implements Serializable {
 		this.activeTab = activeTab;
 	}
 
-	/** Getters and Setters **/
 	public Usuario getUsuario() {
 		return usuario;
 	}
+	
+	public String getTabAtualConsulta() {
+		return tabAtualConsulta;
+	}
+
+	public void setTabAtualConsulta(String tabAtualConsulta) {
+		this.tabAtualConsulta = tabAtualConsulta;
+	}
 
 	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
+		this.usuario = usuario;	
 	}
 
 	public Lancamento getLancamentoSelecionado() {
@@ -143,9 +141,6 @@ public class ManterLancamentoBean implements Serializable {
 		this.lancamento = lancamento;
 	}
 
-	public List<String> pesquisarDescricoes(String descricao) {
-		return this.lancamentosRepository.descricoesQueContem(descricao);
-	}
 
 	public PessoasDAO getPessoas() {
 		return pessoas;
@@ -171,17 +166,11 @@ public class ManterLancamentoBean implements Serializable {
 		this.lancamentosService = lancamentosService;
 	}
 
-	public void saldoMensal(ToggleEvent event) {
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-				"Saldo Mensal", "Saldo para o mês de "
-						+ UtilFormatter.mesAtualTexto() + "é de:"
-						+ getSomaValores());
-		FacesContext.getCurrentInstance().addMessage(null, msg);
-	}
-
+	/** Methods **/
+	
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
-		for (Lancamento lancamento : getLancamentosService().porMes(currentTab)) {
+		for (Lancamento lancamento : getLancamentosService().porMesAno(tabAtualConsulta)) {
 			if (lancamento.getTipo().getDescricao().equals("Receita")&& lancamento.getIsPago().equals(true)) {
 				total = total.add(lancamento.getValor());
 			} else {
@@ -191,18 +180,25 @@ public class ManterLancamentoBean implements Serializable {
 		return UtilFormatter.formatReal(total.toString());
 	}
 
-	/** Methods **/
-
 	@PostLoad
 	public void loadComponents() throws NegocioException {
-		setActiveTab(currentTab - 1);
+		
 		consultar();
 		SessionUtil.getUserNameSession();
 	}
 
 	@PostConstruct
 	public void consultar() throws NegocioException {
-		setLancamentos(getLancamentosService().porMes(UtilFormatter.mesAtual()));
+		setLancamentos(getLancamentosService().porMesAno(tabAtualConsulta));
+	}
+	
+	public List<String> pesquisarDescricoes(String descricao) {
+		return this.lancamentosRepository.descricoesQueContem(descricao);
+	}
+	
+	public List<String> getListaAnosValidos(){
+		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
+		return listaAnosValidos;
 	}
 
 	@Transactional
@@ -274,23 +270,6 @@ public class ManterLancamentoBean implements Serializable {
 		return CONSULTA;
 	}
 
-	public void registrarLogCadastro(ActionEvent event) throws NegocioException {
-		System.out.println("Cadastrando...");
-		System.out.println("Tipo: " + this.lancamento.getTipo());
-		System.out.println("Pessoa: " + this.lancamento.getPessoa().getNome());
-		System.out.println("Categoria"
-				+ this.lancamento.getCategoria().getDescricao());
-		System.out.println("Descrição: " + this.lancamento.getDescricao());
-		System.out.println("Valor: " + this.lancamento.getValor());
-		System.out.println("Data vencimento: "
-				+ this.lancamento.getDataVencimento());
-		System.out.println("Conta paga: " + this.lancamento.getIsPago());
-		System.out.println("Data pagamento: "
-				+ this.lancamento.getDataPagamento());
-		System.out.println("Usuário:" + this.lancamento.getUsername());
-		getLancamentosService().guardar(this.lancamento);
-	}
-
 	public void descricaoModificada(ValueChangeEvent event) {
 		System.out.println("Valor antigo: " + event.getOldValue());
 		System.out.println("Novo valor: " + event.getNewValue());
@@ -299,11 +278,11 @@ public class ManterLancamentoBean implements Serializable {
 
 	public void onTabChange(TabChangeEvent event) throws NegocioException {
 		TabView tv = (TabView) event.getComponent();
-		this.currentTab = tv.getActiveIndex() + 1;
-		setActiveTab(currentTab);
-		setLancamentos(getLancamentosService().porMes(currentTab));
+		this.currentTab = tv.getActiveIndex();
+		setTabAtualConsulta(event.getData().toString());
+		setLancamentos(getLancamentosService().porMesAno(event.getData().toString()));
 	}
-
+	
 	public boolean isParcelasDisable() {
 		return parcelasDisable;
 	}
@@ -311,4 +290,5 @@ public class ManterLancamentoBean implements Serializable {
 	public void setParcelasDisable(boolean parcelasDisable) {
 		this.parcelasDisable = parcelasDisable;
 	}
+
 }

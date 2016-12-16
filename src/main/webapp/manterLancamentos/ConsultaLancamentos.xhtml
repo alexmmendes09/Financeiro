@@ -12,18 +12,13 @@
 	<ui:define name="corpo">
 		<h:form id="frm">
 			<p:growl id="msgs" showDetail="true" />
-			<p:fieldset legend="Saldo Mensal" toggleable="true"
-					toggleSpeed="500">
-					<p:ajax event="toggle" resetValues="true" update="msgs" />
-					<h:panelGrid columns="2" cellpadding="5">
-						<h:outputText value="#{manterLancamentoBean.somaValores}"></h:outputText>
-					</h:panelGrid>
-				</p:fieldset>
-			<p:tabView dynamic="true" cache="false" activeIndex="#{manterLancamentoBean.activeTab}"
-				value="#{manterLancamentoBean.listaMonths}" var="month">
-				<p:ajax event="tabChange"
+			<p:tabView dynamic="true" cache="false" scrollable="true"
+				activeIndex="#{manterLancamentoBean.activeTab}"
+				value="#{manterLancamentoBean.listaAnosValidos}" var="anos">
+				<p:ajax event="tabChange" immediate="true"
 					listener="#{manterLancamentoBean.onTabChange}" />
-				<p:tab title="#{month.descricao}">
+				
+				<p:tab id="mesAno" title="#{anos}">
 					<p:dataTable id="tblLancamentos"
 						selection="#{manterLancamentoBean.lancamentoSelecionado}"
 						rowKey="#{lancamento.id}"
@@ -34,7 +29,7 @@
 						emptyMessage="Nenhum registro encontrado.">
 						<f:facet name="header">
 							<p:outputPanel>
-								<h:outputText value="Lançamentos de #{month.descricao}" />
+								<h:outputText value="Lançamentos de #{meses.descricao}" />
 							</p:outputPanel>
 						</f:facet>
 						<p:column headerText="Pessoa" sortBy="#{lancamento.pessoa.nome}">
@@ -104,7 +99,6 @@
 									style="text-align:right" />
 							</p:row>
 						</p:columnGroup>
-
 					</p:dataTable>
 				</p:tab>
 			</p:tabView>

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -31,13 +32,16 @@ public class UtilFormatter{
 		return mesAtual;
 	}
 	
-	public static String mesAtualTexto(){
+	public static String mesAnoAtualTexto(){
 		GregorianCalendar calendar = new GregorianCalendar();
+		Calendar cal = Calendar.getInstance();
 		String meses[] = {"Janeiro", "Fevereiro", 
 	              "Março", "Abril", "Maio", "Junho", 
 	              "Julho", "Agosto", "Setembro", "Outubro",
 		      "Novembro", "Dezembro"};
 		String mesAtual =  meses[calendar.get(GregorianCalendar.MONTH)];
-		return mesAtual;
+		int anoAtual = cal.get(Calendar.YEAR);
+		String mesAnoAtual = mesAtual+"/"+String.valueOf(anoAtual);
+		return mesAnoAtual;
 	}
 }

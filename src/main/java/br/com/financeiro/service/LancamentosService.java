@@ -51,8 +51,16 @@ public class LancamentosService {
 		this.lancamento.remover(lancamento);
 	}
 
+	public List<Lancamento> porMesAno(String monthYear) {
+		return this.lancamento.porMesAno(monthYear);
+	}
+	
 	public List<Lancamento> porMes(int month) {
 		return this.lancamento.porMes(month);
+	}
+	
+	public List<String> descricoesAnosValidos(){
+		return this.lancamento.descricoesAnosValidos();
 	}
 
 }

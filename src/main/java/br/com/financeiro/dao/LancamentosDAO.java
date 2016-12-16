@@ -61,6 +61,22 @@ public class LancamentosDAO {
 		this.manager.remove(lancamento);
 	}
 
+	public List<Lancamento> porMesAno(String monthYear) {
+		TypedQuery<Lancamento> query = null;
+		try {
+			query = manager.createQuery(
+					"from Lancamento l where DATE_FORMAT(data_vencimento, '%M/%Y') = "
+							+ "'"+monthYear + "'" + " AND L.username = '"
+							+ SessionUtil.getUserNameSession() + "'",
+					Lancamento.class);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			this.manager.close();
+			e.printStackTrace();
+		}
+		return query.getResultList();
+	}
+	
 	public List<Lancamento> porMes(int month) {
 		TypedQuery<Lancamento> query = null;
 		try {
@@ -74,6 +90,15 @@ public class LancamentosDAO {
 			this.manager.close();
 			e.printStackTrace();
 		}
+		return query.getResultList();
+	}
+
+	public List<String> descricoesAnosValidos() {
+		TypedQuery<String> query = manager
+				.createQuery(
+						"select concat(UPPER(DATE_FORMAT(data_vencimento,'%M')), '/' , Year(data_vencimento))"
+								+ "From Lancamento GROUP BY data_vencimento order by data_vencimento ",
+						String.class);
 		return query.getResultList();
 	}
 }
