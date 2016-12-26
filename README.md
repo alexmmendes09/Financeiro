@@ -14,8 +14,8 @@ SISTEMA DE CONTROLE DE FINANCEIRO
 *  Necessário clonar o repositório do projeto via bitbucket e acesse o diretório:
 
 SSH
-git clone git@bitbucket.org:alexmmendes09/lucenelanches.git HTTPS
-git clone https://bitbucket.org/alexmmendes09/lucenelanches.git
+git clone git@bitbucket.org:alexmmendes09/financeiro.git HTTPS
+git clone https://bitbucket.org/alexmmendes09/financeiro.git
 
 #Estrutura#
 
