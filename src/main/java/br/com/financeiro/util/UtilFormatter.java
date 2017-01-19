@@ -32,6 +32,13 @@ public class UtilFormatter{
 		return mesAtual;
 	}
 	
+	public static Integer anoAtual() {
+		Date hoje  = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+		int anoAtual = Integer.parseInt(sdf.format(hoje));
+		return anoAtual;
+	}
+	
 	public static String mesAnoAtualTexto(){
 		GregorianCalendar calendar = new GregorianCalendar();
 		Calendar cal = Calendar.getInstance();

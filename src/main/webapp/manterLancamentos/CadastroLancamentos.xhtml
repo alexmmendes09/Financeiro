@@ -55,19 +55,21 @@
 					<p:ajax update="valor" />
 				</p:inputText>
 
-				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto" />
+				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto"/>
 				<p:selectOneButton id="tipoPagto" required="true" immediate="true"
 					value="#{manterLancamentoBean.lancamento.tipoPagto}"
 					valueChangeListener="#{manterLancamentoBean.tipoPagtoModificado}"
+					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'AVISTA'}"
 					onchange="submit()">
 					<f:selectItems value="#{manterLancamentoBean.tiposPagtos}"
 						var="tipoPagto" itemValue="#{tipoPagto}"
 						itemLabel="#{tipoPagto.descricao}" />
 				</p:selectOneButton>
 
-				<p:outputLabel value="Quantidade de parcelas:"
-					for="parcelas" rendered="#{manterLancamentoBean.parcelasDisable}"/>
-				<p:inputText id="parcelas" rendered="#{manterLancamentoBean.parcelasDisable}"
+				<p:outputLabel value="Quantidade de parcelas:" for="parcelas"
+					rendered="#{manterLancamentoBean.parcelasDisable}" />
+				<p:inputText id="parcelas"
+					rendered="#{manterLancamentoBean.parcelasDisable}"
 					value="#{manterLancamentoBean.lancamento.parcelas}">
 					<f:attribute name="checado"
 						value="#{manterLancamentoBean.tipoPagtoModificado}" />

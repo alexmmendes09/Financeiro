@@ -63,8 +63,8 @@ public class ManterLancamentoBean implements Serializable {
 	private String tabAtualConsulta;
 	@Inject
 	private Usuario usuario;
-	
-	public Meses[] getListaMeses(){
+
+	public Meses[] getListaMeses() {
 		return Meses.values();
 	}
 
@@ -87,7 +87,7 @@ public class ManterLancamentoBean implements Serializable {
 	public Usuario getUsuario() {
 		return usuario;
 	}
-	
+
 	public String getTabAtualConsulta() {
 		return tabAtualConsulta;
 	}
@@ -97,7 +97,7 @@ public class ManterLancamentoBean implements Serializable {
 	}
 
 	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;	
+		this.usuario = usuario;
 	}
 
 	public Lancamento getLancamentoSelecionado() {
@@ -141,7 +141,6 @@ public class ManterLancamentoBean implements Serializable {
 		this.lancamento = lancamento;
 	}
 
-
 	public PessoasDAO getPessoas() {
 		return pessoas;
 	}
@@ -167,36 +166,52 @@ public class ManterLancamentoBean implements Serializable {
 	}
 
 	/** Methods **/
-	
+
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
-		for (Lancamento lancamento : getLancamentosService().porMesAno(tabAtualConsulta)) {
-			if (lancamento.getTipo().getDescricao().equals("Receita")&& lancamento.getIsPago().equals(true)) {
-				total = total.add(lancamento.getValor());
-			} else {
-				total = total.subtract(lancamento.getValor());
+		if (getListaAnosValidos().size() <= 1) {
+			for (Lancamento lancamento : getLancamentosService().porMesAno(listaAnosValidos.get(0))) {
+				total = validaSomaValores(total, lancamento);
+			}
+		} else {
+			for (Lancamento lancamento : getLancamentosService().porMesAno(listaAnosValidos.get(getCurrentTab()))) {
+				total = validaSomaValores(total, lancamento);
 			}
 		}
 		return UtilFormatter.formatReal(total.toString());
 	}
 
+	private BigDecimal validaSomaValores(BigDecimal total, Lancamento lancamento) {
+		if (lancamento.getTipo().getDescricao().equals("Receita") && lancamento.getIsPago().equals(true)) {
+			total = total.add(lancamento.getValor());
+		} else {
+			total = total.subtract(lancamento.getValor());
+		}
+		return total;
+	}
+
 	@PostLoad
 	public void loadComponents() throws NegocioException {
-		
 		consultar();
 		SessionUtil.getUserNameSession();
 	}
 
 	@PostConstruct
 	public void consultar() throws NegocioException {
-		setLancamentos(getLancamentosService().porMesAno(tabAtualConsulta));
+		if (getListaAnosValidos().size() == 1) {
+			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(0)));
+		}else if(getListaAnosValidos().size() == 0){
+			setLancamentos(getLancamentosService().porMes(0));
+		} else {
+			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(getCurrentTab())));
+		}
 	}
-	
+
 	public List<String> pesquisarDescricoes(String descricao) {
 		return this.lancamentosRepository.descricoesQueContem(descricao);
 	}
-	
-	public List<String> getListaAnosValidos(){
+
+	public List<String> getListaAnosValidos() {
 		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
 		return listaAnosValidos;
 	}
@@ -205,22 +220,29 @@ public class ManterLancamentoBean implements Serializable {
 	public void excluir() {
 		FacesContext context = FacesContext.getCurrentInstance();
 		try {
-			getLancamentoSelecionado().setUsername(
-					SessionUtil.getUserNameSession());
+			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
 			this.lancamentosService.excluir(getLancamentoSelecionado());
-			context.addMessage(null, new FacesMessage(
-					FacesMessage.SEVERITY_ERROR, SUCESS, EXCLUSAO));
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, SUCESS, EXCLUSAO));
+			if (getListaAnosValidos().size() != 0) {
+				setCurrentTab(0);
+				setActiveTab(getCurrentTab());
+			}
 			loadComponents();
 		} catch (NegocioException e) {
 			FacesMessage mensagem = new FacesMessage(e.getMessage());
-			context.addMessage(null, new FacesMessage(
-					FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
 		}
 	}
 
 	public void prepararCadastro() {
-		getLancamento();
-		setTodasPessoas(getPessoas().todas());
+		if (getLancamento().getId() != null) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			getLancamento();
+			setTodasPessoas(getPessoas().todas());
+			getLancamento().setTipoPagto(TipoPagto.AVISTA);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Lançamento não será mais parcelado!",null));
+		}
+		
 	}
 
 	public void lancamentoPagoModificado(ValueChangeEvent event) {
@@ -228,11 +250,12 @@ public class ManterLancamentoBean implements Serializable {
 		this.lancamento.setDataPagamento(null);
 		FacesContext.getCurrentInstance().renderResponse();
 	}
+
 	public void tipoPagtoModificado(ValueChangeEvent event) {
-	    String selectedVal=event.getNewValue().toString();
-		if (selectedVal.equals("PARCELADO") ) {
+		String selectedVal = event.getNewValue().toString();
+		if (selectedVal.equals("PARCELADO")) {
 			setParcelasDisable(true);
-		}else{
+		} else {
 			setParcelasDisable(false);
 		}
 		this.lancamento.setParcelas(0);
@@ -245,7 +268,7 @@ public class ManterLancamentoBean implements Serializable {
 		try {
 			getLancamento().setUsername(SessionUtil.getUserNameSession());
 
-			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado") ) {
+			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado")) {
 				Calendar c;
 				Lancamento lancamentoClone;
 				for (int i = 0; i < lancamento.getParcelas(); i++) {
@@ -260,12 +283,10 @@ public class ManterLancamentoBean implements Serializable {
 				getLancamentosService().guardar(getLancamento());
 			}
 			setLancamento(new Lancamento());
-			context.addMessage(null, new FacesMessage(
-					FacesMessage.SEVERITY_ERROR, SUCESS, INCLUSAO));
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, SUCESS, INCLUSAO));
 		} catch (NegocioException e) {
 			FacesMessage mensagem = new FacesMessage(e.getMessage());
-			context.addMessage(null, new FacesMessage(
-					FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
 		}
 		return CONSULTA;
 	}
@@ -280,9 +301,10 @@ public class ManterLancamentoBean implements Serializable {
 		TabView tv = (TabView) event.getComponent();
 		this.currentTab = tv.getActiveIndex();
 		setTabAtualConsulta(event.getData().toString());
+		setActiveTab(currentTab);
 		setLancamentos(getLancamentosService().porMesAno(event.getData().toString()));
 	}
-	
+
 	public boolean isParcelasDisable() {
 		return parcelasDisable;
 	}

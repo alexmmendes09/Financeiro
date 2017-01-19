@@ -59,6 +59,10 @@ public class LancamentosService {
 		return this.lancamento.porMes(month);
 	}
 	
+	public List<Lancamento> porMesAnoRecorrente(int month, int year) {
+		return this.lancamento.porMesAnoRecorrente(month,year);
+	}
+	
 	public List<String> descricoesAnosValidos(){
 		return this.lancamento.descricoesAnosValidos();
 	}
