@@ -6,10 +6,15 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 	<persistence-unit name="FinanceiroPU">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<properties>
-			<!-- JELASTIC -->
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://node18672-financeiro.njs.jelastic.vps-host.net/financeiro" />
+		
+			<!-- LOCAL
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/financeiro" />
 			<property name="javax.persistence.jdbc.user" value="root" />
-			<property name="javax.persistence.jdbc.password" value="BPGklh17595" />
+			<property name="javax.persistence.jdbc.password" value="12345678" />-->
+
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://node18677-financeiro.njs.jelastic.vps-host.net/financeiro" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value="LBVzol11148" />
 			
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
