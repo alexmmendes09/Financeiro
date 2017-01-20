@@ -55,11 +55,11 @@
 					<p:ajax update="valor" />
 				</p:inputText>
 
-				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto"/>
+				<p:outputLabel value="Forma de Pagamento:" for="tipoPagto" />
 				<p:selectOneButton id="tipoPagto" required="true" immediate="true"
 					value="#{manterLancamentoBean.lancamento.tipoPagto}"
 					valueChangeListener="#{manterLancamentoBean.tipoPagtoModificado}"
-					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'AVISTA'}"
+					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'PARCELADO'}"
 					onchange="submit()">
 					<f:selectItems value="#{manterLancamentoBean.tiposPagtos}"
 						var="tipoPagto" itemValue="#{tipoPagto}"
@@ -89,8 +89,8 @@
 					<f:attribute name="checado"
 						value="#{manterLancamentoBean.lancamento.isPago}" />
 				</p:calendar>
-				<h:outputLabel />
 
+				<br />
 				<h:panelGroup>
 					<h:selectBooleanCheckbox id="isPago"
 						value="#{manterLancamentoBean.lancamento.isPago}" immediate="true"
@@ -99,9 +99,14 @@
 					<h:outputLabel value="Conta paga" for="pagoCheckbox" />
 				</h:panelGroup>
 			</h:panelGrid>
+
 			<p:commandButton value="Salvar"
 				action="#{manterLancamentoBean.salvar}" icon="ui-icon-disk"
 				update="@form" render="@all" />
+
+			<p:commandButton value="Cancelar"
+				action="/manterLancamentos/ConsultaLancamentos?faces-redirect=true" 
+				icon="ui-icon-cancel" ajax="false" immediate="true"/>
 		</h:form>
 	</ui:define>
 </ui:composition>

@@ -55,14 +55,16 @@ public class ManterLancamentoBean implements Serializable {
 	private String EXCLUSAO = "Lançamento excluído com sucesso!";
 	private String INCLUSAO = "Lançamento efetuado com sucesso";
 	private String CONSULTA = "/manterLancamentos/ConsultaLancamentos?faces-redirect=true";
-	private String SUCESS = "Ação realizada com sucesso!";
-	private String ERROR = "Ação não permitida!";
 	private int currentTab = UtilFormatter.mesAtual();
 	private Integer activeTab;
 	private boolean parcelasDisable;
 	private String tabAtualConsulta;
 	@Inject
 	private Usuario usuario;
+	
+	/**
+	 * {@value}getters and setters
+	 */
 
 	public Meses[] getListaMeses() {
 		return Meses.values();
@@ -164,8 +166,50 @@ public class ManterLancamentoBean implements Serializable {
 	public void setLancamentosService(LancamentosService lancamentosService) {
 		this.lancamentosService = lancamentosService;
 	}
+	public boolean isParcelasDisable() {
+		return parcelasDisable;
+	}
 
-	/** Methods **/
+	public void setParcelasDisable(boolean parcelasDisable) {
+		this.parcelasDisable = parcelasDisable;
+	}
+	
+	/**
+	 * {@code}Methods
+	 */
+	@PostLoad
+	public void loadComponents() throws NegocioException {
+		consultar();
+	}
+
+	@PostConstruct
+	public void consultar() throws NegocioException {
+		if (getListaAnosValidos().size() == 1) {
+			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(0)));
+		}else if(getListaAnosValidos().size() == 0){
+			setLancamentos(getLancamentosService().porMes(0));
+		} else {
+			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(getCurrentTab())));
+		}
+	}
+	
+	public void prepararCadastro() {
+		if (getLancamento().getId() != null) {
+			String msg = "Lançamento não será mais parcelado!";
+			addMessage(msg);
+			getLancamento();
+			setTodasPessoas(getPessoas().todas());
+			getLancamento().setTipoPagto(TipoPagto.AVISTA);
+		}
+	}
+	
+	private void addMessage(String msg) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage(null, new FacesMessage(msg));
+	}
+	public List<String> pesquisarDescricoes(String descricao) {
+		return this.lancamentosRepository.descricoesQueContem(descricao);
+	}
 
 	public String getSomaValores() {
 		BigDecimal total = new BigDecimal(0);
@@ -180,6 +224,11 @@ public class ManterLancamentoBean implements Serializable {
 		}
 		return UtilFormatter.formatReal(total.toString());
 	}
+	
+	public List<String> getListaAnosValidos() {
+		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
+		return listaAnosValidos;
+	}
 
 	private BigDecimal validaSomaValores(BigDecimal total, Lancamento lancamento) {
 		if (lancamento.getTipo().getDescricao().equals("Receita") && lancamento.getIsPago().equals(true)) {
@@ -189,60 +238,47 @@ public class ManterLancamentoBean implements Serializable {
 		}
 		return total;
 	}
-
-	@PostLoad
-	public void loadComponents() throws NegocioException {
-		consultar();
-		SessionUtil.getUserNameSession();
-	}
-
-	@PostConstruct
-	public void consultar() throws NegocioException {
-		if (getListaAnosValidos().size() == 1) {
-			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(0)));
-		}else if(getListaAnosValidos().size() == 0){
-			setLancamentos(getLancamentosService().porMes(0));
-		} else {
-			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(getCurrentTab())));
+	
+	@Transactional
+	public String salvar() throws NegocioException, CloneNotSupportedException {
+		try {
+			getLancamento().setUsername(SessionUtil.getUserNameSession());
+			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado")) {
+				Calendar c;
+				Lancamento lancamentoClone;
+				for (int i = 0; i < lancamento.getParcelas(); i++) {
+					c = Calendar.getInstance();
+					c.setTime(lancamento.getDataVencimento());
+					c.add(Calendar.MONTH, i);
+					lancamentoClone = (Lancamento) lancamento.clone();
+					lancamentoClone.setDataVencimento(c.getTime());
+					getLancamentosService().guardar(lancamentoClone);
+				}
+			} else {
+				getLancamentosService().guardar(getLancamento());
+			}
+			setLancamento(new Lancamento());
+			addMessage(INCLUSAO);
+		} catch (NegocioException e) {
+			addMessage(e.getMessage());
 		}
-	}
-
-	public List<String> pesquisarDescricoes(String descricao) {
-		return this.lancamentosRepository.descricoesQueContem(descricao);
-	}
-
-	public List<String> getListaAnosValidos() {
-		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
-		return listaAnosValidos;
+		return CONSULTA;
 	}
 
 	@Transactional
 	public void excluir() {
-		FacesContext context = FacesContext.getCurrentInstance();
 		try {
 			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
 			this.lancamentosService.excluir(getLancamentoSelecionado());
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, SUCESS, EXCLUSAO));
+			addMessage(EXCLUSAO);
 			if (getListaAnosValidos().size() != 0) {
 				setCurrentTab(0);
 				setActiveTab(getCurrentTab());
 			}
 			loadComponents();
 		} catch (NegocioException e) {
-			FacesMessage mensagem = new FacesMessage(e.getMessage());
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
+			addMessage(e.getMessage());
 		}
-	}
-
-	public void prepararCadastro() {
-		if (getLancamento().getId() != null) {
-			FacesContext context = FacesContext.getCurrentInstance();
-			getLancamento();
-			setTodasPessoas(getPessoas().todas());
-			getLancamento().setTipoPagto(TipoPagto.AVISTA);
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Lançamento não será mais parcelado!",null));
-		}
-		
 	}
 
 	public void lancamentoPagoModificado(ValueChangeEvent event) {
@@ -262,55 +298,12 @@ public class ManterLancamentoBean implements Serializable {
 		FacesContext.getCurrentInstance().renderResponse();
 	}
 
-	@Transactional
-	public String salvar() throws NegocioException, CloneNotSupportedException {
-		FacesContext context = FacesContext.getCurrentInstance();
-		try {
-			getLancamento().setUsername(SessionUtil.getUserNameSession());
-
-			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado")) {
-				Calendar c;
-				Lancamento lancamentoClone;
-				for (int i = 0; i < lancamento.getParcelas(); i++) {
-					c = Calendar.getInstance();
-					c.setTime(lancamento.getDataVencimento());
-					c.add(Calendar.MONTH, i);
-					lancamentoClone = (Lancamento) lancamento.clone();
-					lancamentoClone.setDataVencimento(c.getTime());
-					getLancamentosService().guardar(lancamentoClone);
-				}
-			} else {
-				getLancamentosService().guardar(getLancamento());
-			}
-			setLancamento(new Lancamento());
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, SUCESS, INCLUSAO));
-		} catch (NegocioException e) {
-			FacesMessage mensagem = new FacesMessage(e.getMessage());
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ERROR, mensagem.toString()));
-		}
-		return CONSULTA;
-	}
-
-	public void descricaoModificada(ValueChangeEvent event) {
-		System.out.println("Valor antigo: " + event.getOldValue());
-		System.out.println("Novo valor: " + event.getNewValue());
-		FacesContext.getCurrentInstance().renderResponse();
-	}
-
 	public void onTabChange(TabChangeEvent event) throws NegocioException {
 		TabView tv = (TabView) event.getComponent();
 		this.currentTab = tv.getActiveIndex();
 		setTabAtualConsulta(event.getData().toString());
 		setActiveTab(currentTab);
 		setLancamentos(getLancamentosService().porMesAno(event.getData().toString()));
-	}
-
-	public boolean isParcelasDisable() {
-		return parcelasDisable;
-	}
-
-	public void setParcelasDisable(boolean parcelasDisable) {
-		this.parcelasDisable = parcelasDisable;
 	}
 
 }

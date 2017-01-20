@@ -29,6 +29,5 @@ public class SessionUtil implements Serializable {
 		String userNameSession = (String) session.getAttribute("username");
 		return userNameSession;
 	}
-
 	
 }
