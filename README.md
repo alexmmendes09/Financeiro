@@ -8,7 +8,7 @@ SISTEMA DE CONTROLE DE FINANCEIRO
  #HTML, CSS e JavaScript; PrimeFaces:# PrimeFaces é uma bibliotecas de componentes ricos em JavaServer Faces. A suíte de componentes inclui diversos campos de entrada, botões, tabelas de dados, árvores, gráficos, diálogos, etc.
 
 #Comentários#
- Bibliotecas do Hibernate, JFreeChart, MySQL JDBC, Mojarra (implementação JSF da Oracle), JSTL, Facelets, Richfaces, Commons BeanUtils, Commons Digester, Commons Logging, Log4j e SL4J Log4j; Eclipse, JBoss Tools, EMS SQL Manager for MySQL, Toad for MySQL e MySQL GUI Tools, MySqlServer 6.0; JAVA 8; Tomcat 7; Maven2;
+ Bibliotecas do Hibernate, JFreeChart, MySQL JDBC, Mojarra (implementação JSF da Oracle), JSTL, Facelets, Primefaces, Commons BeanUtils, Commons Digester, Commons Logging, Log4j e SL4J Log4j; Eclipse, JBoss Tools, EMS SQL Manager for MySQL, Toad for MySQL e MySQL GUI Tools, MySqlServer 6.0; JAVA 8; Tomcat 7; Maven2;
 
 #Instruções:#
 *  Necessário clonar o repositório do projeto via bitbucket e acesse o diretório:
