@@ -5,8 +5,7 @@
 	version="2.0">
 	<application>
 		<locale-config>
-			<default-locale>pt</default-locale>
-			<supported-locale>en</supported-locale>
+			<default-locale>en</default-locale>
 		</locale-config>
 		<message-bundle>br.com.financeiro.resources.Messages</message-bundle>
 	</application>
