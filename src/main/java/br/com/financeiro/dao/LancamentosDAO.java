@@ -110,7 +110,9 @@ public class LancamentosDAO {
 		TypedQuery<String> query = manager
 				.createQuery(
 						"select concat(UPPER(DATE_FORMAT(data_vencimento,'%M')), '/' , Year(data_vencimento))"
-								+ "From Lancamento GROUP BY data_vencimento order by data_vencimento ",
+								+ "From Lancamento "
+								+ "WHERE username = '"+SessionUtil.getUserNameSession() + "'"
+								+ "GROUP BY data_vencimento order by data_vencimento ",
 						String.class);
 		return query.getResultList();
 	}
