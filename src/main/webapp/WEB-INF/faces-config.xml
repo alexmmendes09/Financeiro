@@ -3,10 +3,4 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
 	version="2.0">
-	<application>
-		<locale-config>
-			<default-locale>pt_BR</default-locale>
-		</locale-config>
-		<message-bundle>br.com.financeiro.resources.messages_pt_BR</message-bundle>
-	</application>
 </faces-config>
