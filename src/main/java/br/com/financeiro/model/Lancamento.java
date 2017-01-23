@@ -42,6 +42,9 @@ public class Lancamento implements Cloneable {
 	private String username;
 	private Integer parcelas;
 	private TipoPagto tipoPagto;
+	private String session_id;
+	private Integer num_parcelas;
+	
 	
 	@Id
 	@GeneratedValue
@@ -148,6 +151,23 @@ public class Lancamento implements Cloneable {
 		this.tipoPagto = tipoPagto;
 	}
 	
+	@NotEmpty
+	@Column(length = 255, nullable = false)
+	public String getSession_id() {
+		return session_id;
+	}
+	public void setSession_id(String session_id) {
+		this.session_id = session_id;
+	}
+	
+	@Column(length = 5, nullable = true)
+	public Integer getNum_parcelas() {
+		return num_parcelas;
+	}
+	public void setNum_parcelas(Integer num_parcelas) {
+		this.num_parcelas = num_parcelas;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -175,4 +195,5 @@ public class Lancamento implements Cloneable {
 	public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
+	
 }

@@ -34,9 +34,9 @@
 						<p:column headerText="Pessoa" sortBy="#{lancamento.pessoa.nome}">
 							<h:outputText value="#{lancamento.pessoa.nome}" />
 						</p:column>
-						<p:column headerText="Descrição" filterMatchMode="contains"
-							sortBy="#{lancamento.descricao}">
-							<h:outputText value="#{lancamento.descricao}" />
+						<p:column headerText="Pagamento" filterMatchMode="contains"
+							sortBy="#{lancamento.tipoPagto}">
+							<h:outputText value="#{lancamento.tipoPagto}" />
 						</p:column>
 						<p:column headerText="Categoria"
 							sortBy="#{lancamento.categoria.descricao}">
@@ -52,7 +52,7 @@
 									timeZone="America/Sao_Paulo" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="Pagamento" style="text-align: center"
+						<p:column headerText="Pago em:" style="text-align: center"
 							sortBy="#{lancamento.dataPagamento}">
 							<h:outputText value="#{lancamento.dataPagamento}">
 								<f:convertDateTime pattern="dd/MM/yyyy"
@@ -76,11 +76,21 @@
 								<f:param name="id" value="#{lancamento.id}" />
 							</p:button>
 							<p:commandButton icon="ui-icon-trash" title="Excluir"
+								rendered="#{lancamento.tipoPagto != 'PARCELADO'}"
 								process="@form" update="@form"
 								action="#{manterLancamentoBean.excluir}">
 								<f:setPropertyActionListener value="#{lancamento}"
 									target="#{manterLancamentoBean.lancamentoSelecionado}" />
 							</p:commandButton>
+							
+							<p:commandButton icon="ui-icon-trash" title="Excluir Grupo"
+								rendered="#{lancamento.tipoPagto == 'PARCELADO'}"
+								process="@form" update="@form"
+								action="#{manterLancamentoBean.excluirParcelas}">
+								<f:setPropertyActionListener value="#{lancamento}"
+									target="#{manterLancamentoBean.lancamentoSelecionado}" />
+							</p:commandButton>
+							
 						</p:column>
 						<p:rowExpansion>
 							<p:panelGrid columns="2" style="width:300px">

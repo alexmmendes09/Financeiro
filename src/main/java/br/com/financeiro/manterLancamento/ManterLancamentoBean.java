@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -58,10 +59,11 @@ public class ManterLancamentoBean implements Serializable {
 	private int currentTab = UtilFormatter.mesAtual();
 	private Integer activeTab;
 	private boolean parcelasDisable;
+	private boolean qtdadeParcelas;
 	private String tabAtualConsulta;
 	@Inject
 	private Usuario usuario;
-	
+
 	/**
 	 * {@value}getters and setters
 	 */
@@ -166,6 +168,7 @@ public class ManterLancamentoBean implements Serializable {
 	public void setLancamentosService(LancamentosService lancamentosService) {
 		this.lancamentosService = lancamentosService;
 	}
+
 	public boolean isParcelasDisable() {
 		return parcelasDisable;
 	}
@@ -173,7 +176,15 @@ public class ManterLancamentoBean implements Serializable {
 	public void setParcelasDisable(boolean parcelasDisable) {
 		this.parcelasDisable = parcelasDisable;
 	}
-	
+
+	public boolean isQtdadeParcelas() {
+		return qtdadeParcelas;
+	}
+
+	public void setQtdadeParcelas(boolean qtdadeParcelas) {
+		this.qtdadeParcelas = qtdadeParcelas;
+	}
+
 	/**
 	 * {@code}Methods
 	 */
@@ -186,27 +197,30 @@ public class ManterLancamentoBean implements Serializable {
 	public void consultar() throws NegocioException {
 		if (getListaAnosValidos().size() == 1) {
 			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(0)));
-		}else if(getListaAnosValidos().size() == 0){
+		} else if (getListaAnosValidos().size() == 0) {
 			setLancamentos(getLancamentosService().porMes(0));
 		} else {
 			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(getCurrentTab())));
 		}
 	}
-	
+
 	public void prepararCadastro() {
 		if (getLancamento().getId() != null) {
-			String msg = "Lançamento não será mais parcelado!";
+			String msg = "Forma de pagamento não será mais modificada!";
 			addMessage(msg);
 			getLancamento();
+			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado")) {
+				setQtdadeParcelas(true);
+			}
 			setTodasPessoas(getPessoas().todas());
-			getLancamento().setTipoPagto(TipoPagto.AVISTA);
 		}
 	}
-	
+
 	private void addMessage(String msg) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.addMessage(null, new FacesMessage(msg));
 	}
+
 	public List<String> pesquisarDescricoes(String descricao) {
 		return this.lancamentosRepository.descricoesQueContem(descricao);
 	}
@@ -224,7 +238,7 @@ public class ManterLancamentoBean implements Serializable {
 		}
 		return UtilFormatter.formatReal(total.toString());
 	}
-	
+
 	public List<String> getListaAnosValidos() {
 		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
 		return listaAnosValidos;
@@ -238,7 +252,7 @@ public class ManterLancamentoBean implements Serializable {
 		}
 		return total;
 	}
-	
+
 	@Transactional
 	public String salvar() throws NegocioException, CloneNotSupportedException {
 		try {
@@ -246,15 +260,22 @@ public class ManterLancamentoBean implements Serializable {
 			if (getLancamento().getTipoPagto().getDescricao().equals("Parcelado")) {
 				Calendar c;
 				Lancamento lancamentoClone;
-				for (int i = 0; i < lancamento.getParcelas(); i++) {
+				Random gerador = new Random();
+				Integer complemento = gerador.nextInt();
+				for (int i = 1; i <= lancamento.getParcelas(); i++) {
 					c = Calendar.getInstance();
 					c.setTime(lancamento.getDataVencimento());
 					c.add(Calendar.MONTH, i);
 					lancamentoClone = (Lancamento) lancamento.clone();
 					lancamentoClone.setDataVencimento(c.getTime());
+					lancamentoClone.setSession_id(SessionUtil.getSession().getId()+complemento.toString());
+					lancamentoClone.setNum_parcelas(i);
 					getLancamentosService().guardar(lancamentoClone);
 				}
 			} else {
+				if (getLancamento().getId() == null) {
+					getLancamento().setSession_id(SessionUtil.getSession().getId());
+				}
 				getLancamentosService().guardar(getLancamento());
 			}
 			setLancamento(new Lancamento());
@@ -270,6 +291,22 @@ public class ManterLancamentoBean implements Serializable {
 		try {
 			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
 			this.lancamentosService.excluir(getLancamentoSelecionado());
+			addMessage(EXCLUSAO);
+			if (getListaAnosValidos().size() != 0) {
+				setCurrentTab(0);
+				setActiveTab(getCurrentTab());
+			}
+			loadComponents();
+		} catch (NegocioException e) {
+			addMessage(e.getMessage());
+		}
+	}
+
+	@Transactional
+	public void excluirParcelas() {
+		try {
+			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
+			this.lancamentosService.excluirParcelas(getLancamentoSelecionado());
 			addMessage(EXCLUSAO);
 			if (getListaAnosValidos().size() != 0) {
 				setCurrentTab(0);

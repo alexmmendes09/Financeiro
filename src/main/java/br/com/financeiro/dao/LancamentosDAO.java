@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import br.com.financeiro.model.Lancamento;
@@ -57,6 +58,13 @@ public class LancamentosDAO {
 
 	public void remover(Lancamento lancamento) {
 		this.manager.remove(lancamento);
+	}
+	
+	public void removerParcelas(Lancamento lancamento) {
+		Query query = null;
+		query = manager.createQuery("delete Lancamento where session_id = :SESSION_ID");
+		query.setParameter("SESSION_ID",lancamento.getSession_id());
+		query.executeUpdate();
 	}
 
 	public List<Lancamento> porMesAno(String monthYear) {

@@ -59,7 +59,7 @@
 				<p:selectOneButton id="tipoPagto" required="true" immediate="true"
 					value="#{manterLancamentoBean.lancamento.tipoPagto}"
 					valueChangeListener="#{manterLancamentoBean.tipoPagtoModificado}"
-					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'PARCELADO'}"
+					disabled="#{manterLancamentoBean.lancamento.id != null}"
 					onchange="submit()">
 					<f:selectItems value="#{manterLancamentoBean.tiposPagtos}"
 						var="tipoPagto" itemValue="#{tipoPagto}"
@@ -70,7 +70,18 @@
 					rendered="#{manterLancamentoBean.parcelasDisable}" />
 				<p:inputText id="parcelas"
 					rendered="#{manterLancamentoBean.parcelasDisable}"
+					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'PARCELADO'}"
 					value="#{manterLancamentoBean.lancamento.parcelas}">
+					<f:attribute name="checado"
+						value="#{manterLancamentoBean.tipoPagtoModificado}" />
+				</p:inputText>
+				
+				<p:outputLabel value="Parcela:" for="parcelas"
+					rendered="#{manterLancamentoBean.qtdadeParcelas}" />
+				<p:inputText id="qtdParcelas"
+					rendered="#{manterLancamentoBean.qtdadeParcelas}"
+					disabled="#{manterLancamentoBean.lancamento.tipoPagto == 'PARCELADO'}"
+					value="#{manterLancamentoBean.lancamento.num_parcelas} de #{manterLancamentoBean.lancamento.parcelas}">
 					<f:attribute name="checado"
 						value="#{manterLancamentoBean.tipoPagtoModificado}" />
 				</p:inputText>
@@ -105,8 +116,8 @@
 				update="@form" render="@all" />
 
 			<p:commandButton value="Cancelar"
-				action="/manterLancamentos/ConsultaLancamentos?faces-redirect=true" 
-				icon="ui-icon-cancel" ajax="false" immediate="true"/>
+				action="/manterLancamentos/ConsultaLancamentos?faces-redirect=true"
+				icon="ui-icon-cancel" ajax="false" immediate="true" />
 		</h:form>
 	</ui:define>
 </ui:composition>

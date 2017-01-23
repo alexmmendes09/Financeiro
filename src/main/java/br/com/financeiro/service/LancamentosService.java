@@ -50,6 +50,16 @@ public class LancamentosService {
 		}
 		this.lancamento.remover(lancamento);
 	}
+	
+	public void excluirParcelas(Lancamento lancamento) throws NegocioException {
+		lancamento = this.lancamento.porId(lancamento.getId());
+		if (lancamento.getDataPagamento() != null) {
+			throw new NegocioException(
+					"Não é possível excluir um lançamento pago!");
+		}
+		this.lancamento.removerParcelas(lancamento);
+	}
+	
 
 	public List<Lancamento> porMesAno(String monthYear) {
 		return this.lancamento.porMesAno(monthYear);
