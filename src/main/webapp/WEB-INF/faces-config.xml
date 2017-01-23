@@ -6,9 +6,7 @@
 	<application>
 		<locale-config>
 			<default-locale>pt_BR</default-locale>
-			<supported-locale>en_US</supported-locale>
-			<supported-locale>en</supported-locale>
 		</locale-config>
-		<message-bundle>br.com.financeiro.resources.Messages</message-bundle>
+		<message-bundle>br.com.financeiro.resources.messages_pt_BR</message-bundle>
 	</application>
 </faces-config>
