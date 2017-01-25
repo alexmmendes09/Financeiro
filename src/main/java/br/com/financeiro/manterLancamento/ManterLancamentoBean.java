@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.PostLoad;
 
+import org.primefaces.component.tabview.Tab;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.TabChangeEvent;
 
@@ -63,6 +64,7 @@ public class ManterLancamentoBean implements Serializable {
 	private String tabAtualConsulta;
 	@Inject
 	private Usuario usuario;
+	private TabView tabView = new TabView();
 
 	/**
 	 * {@value}getters and setters
@@ -184,6 +186,17 @@ public class ManterLancamentoBean implements Serializable {
 	public void setQtdadeParcelas(boolean qtdadeParcelas) {
 		this.qtdadeParcelas = qtdadeParcelas;
 	}
+	
+	public List<String> getListaAnosValidos() {
+		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
+	    for (String mesAno : listaAnosValidos) {
+	        Tab t = new Tab();
+	        t.setTitle(mesAno);
+	        tabView.getChildren().add(t);
+	    }
+		return listaAnosValidos;
+	}
+
 
 	/**
 	 * {@code}Methods
@@ -191,16 +204,19 @@ public class ManterLancamentoBean implements Serializable {
 	@PostLoad
 	public void loadComponents() throws NegocioException {
 		consultar();
+		setTabAtualConsulta(tabView.getDefaultEventName());
 	}
 
 	@PostConstruct
 	public void consultar() throws NegocioException {
+		setCurrentTab(UtilFormatter.mesAtual());
 		if (getListaAnosValidos().size() == 1) {
 			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(0)));
 		} else if (getListaAnosValidos().size() == 0) {
 			setLancamentos(getLancamentosService().porMes(0));
 		} else {
-			setLancamentos(getLancamentosService().porMesAno(getListaAnosValidos().get(getCurrentTab())));
+			setActiveTab(getCurrentTab());
+			setLancamentos(getLancamentosService().porMesAno(listaAnosValidos.get(getActiveTab())));
 		}
 	}
 
@@ -239,11 +255,7 @@ public class ManterLancamentoBean implements Serializable {
 		return UtilFormatter.formatReal(total.toString());
 	}
 
-	public List<String> getListaAnosValidos() {
-		this.listaAnosValidos = this.lancamentosService.descricoesAnosValidos();
-		return listaAnosValidos;
-	}
-
+	
 	private BigDecimal validaSomaValores(BigDecimal total, Lancamento lancamento) {
 		if (lancamento.getTipo().getDescricao().equals("Receita") && lancamento.getIsPago().equals(true)) {
 			total = total.add(lancamento.getValor());
@@ -268,7 +280,7 @@ public class ManterLancamentoBean implements Serializable {
 					c.add(Calendar.MONTH, i);
 					lancamentoClone = (Lancamento) lancamento.clone();
 					lancamentoClone.setDataVencimento(c.getTime());
-					lancamentoClone.setSession_id(SessionUtil.getSession().getId()+complemento.toString());
+					lancamentoClone.setSession_id(SessionUtil.getSession().getId() + complemento.toString());
 					lancamentoClone.setNum_parcelas(i);
 					getLancamentosService().guardar(lancamentoClone);
 				}
@@ -289,14 +301,8 @@ public class ManterLancamentoBean implements Serializable {
 	@Transactional
 	public void excluir() {
 		try {
-			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
 			this.lancamentosService.excluir(getLancamentoSelecionado());
-			addMessage(EXCLUSAO);
-			if (getListaAnosValidos().size() != 0) {
-				setCurrentTab(0);
-				setActiveTab(getCurrentTab());
-			}
-			loadComponents();
+			processaExclusao();
 		} catch (NegocioException e) {
 			addMessage(e.getMessage());
 		}
@@ -305,17 +311,20 @@ public class ManterLancamentoBean implements Serializable {
 	@Transactional
 	public void excluirParcelas() {
 		try {
-			getLancamentoSelecionado().setUsername(SessionUtil.getUserNameSession());
 			this.lancamentosService.excluirParcelas(getLancamentoSelecionado());
-			addMessage(EXCLUSAO);
-			if (getListaAnosValidos().size() != 0) {
-				setCurrentTab(0);
-				setActiveTab(getCurrentTab());
-			}
-			loadComponents();
+			processaExclusao();
 		} catch (NegocioException e) {
 			addMessage(e.getMessage());
 		}
+	}
+
+	private void processaExclusao() throws NegocioException {
+		addMessage(EXCLUSAO);
+		if (getListaAnosValidos().size() != 0) {
+			setCurrentTab(0);
+			setActiveTab(getCurrentTab());
+		}
+		loadComponents();
 	}
 
 	public void lancamentoPagoModificado(ValueChangeEvent event) {
@@ -337,10 +346,22 @@ public class ManterLancamentoBean implements Serializable {
 
 	public void onTabChange(TabChangeEvent event) throws NegocioException {
 		TabView tv = (TabView) event.getComponent();
+		System.out.println(event.getData());
 		this.currentTab = tv.getActiveIndex();
 		setTabAtualConsulta(event.getData().toString());
 		setActiveTab(currentTab);
 		setLancamentos(getLancamentosService().porMesAno(event.getData().toString()));
 	}
+	
+	/*
+	public TabView getTabView() {
+	    TabView tabView = new TabView();
+	    for (String mesAno : getListaAnosValidos()) {
+	        Tab t = new Tab();
+	        t.setTitle(mesAno);
+	        tabView.getChildren().add(t);
+	    }
+	    return tabView;
+	}*/
 
 }

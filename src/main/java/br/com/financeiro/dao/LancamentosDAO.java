@@ -73,7 +73,8 @@ public class LancamentosDAO {
 			query = manager.createQuery(
 					"from Lancamento l where DATE_FORMAT(data_vencimento, '%M/%Y') = "
 							+ "'"+monthYear + "'" + " AND L.username = '"
-							+ SessionUtil.getUserNameSession() + "'",
+							+ SessionUtil.getUserNameSession() + "'"
+							+ "AND YEAR(data_vencimento) <= YEAR(CURRENT_DATE)+1",
 					Lancamento.class);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -88,7 +89,8 @@ public class LancamentosDAO {
 			query = manager.createQuery(
 					"from Lancamento l where MONTH(L.dataVencimento) = " + month
 							+ " AND L.username = '"
-							+ SessionUtil.getUserNameSession() + "'",
+							+ SessionUtil.getUserNameSession() + "'"
+							+ "AND YEAR(data_vencimento) <= YEAR(CURRENT_DATE)+1",
 					Lancamento.class);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -105,7 +107,8 @@ public class LancamentosDAO {
 						+ " WHERE MONTH(L.dataVencimento) = " + month
 						+ " AND YEAR(L.dataVencimento) = " + year
 						+ " AND YEAR(data_vencimento) <= YEAR(CURRENT_DATE)+1"
-						+ " AND L.username = '"+SessionUtil.getUserNameSession() + "'",
+						+ " AND L.username = '"+SessionUtil.getUserNameSession() + "'"
+						+ " AND YEAR(data_vencimento) <= YEAR(CURRENT_DATE)+1",
 					Lancamento.class);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -120,6 +123,7 @@ public class LancamentosDAO {
 						"select concat(UPPER(DATE_FORMAT(data_vencimento,'%M')), '/' , Year(data_vencimento))"
 								+ "From Lancamento "
 								+ "WHERE username = '"+SessionUtil.getUserNameSession() + "'"
+								+ " AND YEAR(data_vencimento) <= YEAR(CURRENT_DATE)+1"
 								+ "GROUP BY data_vencimento order by data_vencimento ",
 						String.class);
 		return query.getResultList();
