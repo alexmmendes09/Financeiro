@@ -7,7 +7,7 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<properties>
 			<!-- JELASTIC -->
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://db4free.net:3307/financeiro" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://mysql8.db4free.net/financeiro" />
 			<property name="javax.persistence.jdbc.user" value="finance" />
 			<property name="javax.persistence.jdbc.password" value="1q2w3e4r5t6y" />
 
