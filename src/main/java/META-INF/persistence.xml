@@ -11,7 +11,7 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 			<property name="javax.persistence.jdbc.user" value="root" />
 			<property name="javax.persistence.jdbc.password" value="KYQlys94415" />-->
 			
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://http://sql55.hostinger.com.br/u692923127_finan" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://sql55.hostinger.com.br/u692923127_finan" />
 			<property name="javax.persistence.jdbc.user" value="u692923127_admin" />
 			<property name="javax.persistence.jdbc.password" value="1q2w3e4r5t6y" />
 			
